@@ -114,26 +114,7 @@ public class SkyscraperConfig implements Configuration {
      */
     @Override
     public boolean isGoal() {
-        if (!findEmpty()) {
-            System.out.println("numOfMaxN " + numOfMaxN());
-            System.out.println("numOfMaxW " + numOfMaxW());
-            System.out.println("numOfMaxE " + numOfMaxE());
-            System.out.println("numOfMaxS " + numOfMaxS());
-            if (direction.get("W").get(currRow) != numOfMaxW()) {
-                return false;
-            }
-            if (direction.get("E").get(currRow) != numOfMaxE()) {
-                return false;
-            }
-            if (direction.get("N").get(currCol) != numOfMaxN()) {
-                return false;
-            }
-            if (direction.get("S").get(currCol) != numOfMaxS()) {
-                return false;
-            }
-            return true;
-        }
-        return false;
+        return (!findEmpty());
     }
 
     /**
