@@ -121,7 +121,6 @@ public class SkyscraperConfig implements Configuration {
     @Override
     public Collection<Configuration> getSuccessors() {
         findEmpty();
-        System.out.println("current row,col: (" + currRow + ", " + currCol + ")");
         List<Configuration> successors = new LinkedList<Configuration>();
         for (int num=1; num <= this.dim; num++) {
             if (notInRowCol(num)) {
@@ -161,7 +160,6 @@ public class SkyscraperConfig implements Configuration {
      */
     @Override
     public boolean isValid() {
-        // if side number is 1, neighboring number should be dim (OR EMPTY!!!!), else invalid
         if (direction.get("W").get(currRow) == 1) {
             if ((this.board[currRow][0] != dim) &&
                     (this.board[currRow][0] != EMPTY)) {
@@ -186,61 +184,6 @@ public class SkyscraperConfig implements Configuration {
                 return false;
             }
         }
-        // if side number is dim-1, neighboring number should not be >=dim-1
-        if (direction.get("W").get(currRow) == dim-1) {
-            if (((this.board[currRow][0] == dim) || (this.board[currRow][0] == dim-1)) &&
-                    (this.board[currRow][0] != EMPTY)) {
-                return false;
-            }
-        }
-        if (direction.get("E").get(currRow) == dim-1) {
-            if (((this.board[currRow][dim - 1] == dim) || (this.board[currRow][dim - 1] == dim-1)) &&
-                    (this.board[currRow][dim - 1] != EMPTY)) {
-                return false;
-            }
-        }
-        if (direction.get("N").get(currCol) == dim-1) {
-            if (((this.board[0][currCol] == dim) || (this.board[0][currCol] == dim-1))  &&
-                    (this.board[0][currCol] != EMPTY)) {
-                return false;
-            }
-        }
-        if (direction.get("S").get(currCol) == dim-1) {
-            if (((this.board[dim - 1][currCol] == dim) || (this.board[dim - 1][currCol] == dim-1)) &&
-                    (this.board[dim - 1][currCol] != EMPTY)) {
-                return false;
-            }
-        }
-        // if side number is dim, board row should be 1 to dim
-        ArrayList<Integer> wanted = new ArrayList<>();
-        for (int i=1; i <= dim; i++) {
-            wanted.add(i);
-        }
-        if (direction.get("W").get(currRow) == dim) {
-            if ((board[currRow][currCol] != wanted.get(currCol)) &&
-                    (board[currRow][currCol] != EMPTY)) {
-                return false;
-            }
-        }
-        if (direction.get("N").get(currCol) == dim) {
-            if ((board[currRow][currCol] != wanted.get(currRow)) &&
-                    (board[currRow][currCol] != EMPTY)) {
-                return false;
-            }
-        }
-        Collections.reverse(wanted);
-        if (direction.get("E").get(currRow) == dim) {
-            if ((board[currRow][currCol] != wanted.get(currCol)) &&
-                    (board[currRow][currCol] != EMPTY)) {
-                return false;
-            }
-        }
-        if (direction.get("S").get(currCol) == dim) {
-            if ((board[currRow][currCol] != wanted.get(currRow)) &&
-                    (board[currRow][currCol] != EMPTY)) {
-                return false;
-            }
-        }
         boolean hasEmptyRow = false;
         for (int col=0; col < dim; col++) {
             if (board[currRow][col] == EMPTY) {
@@ -248,8 +191,6 @@ public class SkyscraperConfig implements Configuration {
             }
         }
         if (!hasEmptyRow) {
-            System.out.println("numOfMaxW " + numOfMaxW());
-            System.out.println("numOfMaxE " + numOfMaxE());
             if (direction.get("W").get(currRow) != numOfMaxW()) {
                 return false;
             }
@@ -264,9 +205,6 @@ public class SkyscraperConfig implements Configuration {
             }
         }
         if (!hasEmptyCol) {
-            System.out.println("numOfMaxN " + numOfMaxN());
-            System.out.println("numOfMaxS " + numOfMaxS());
-            System.out.println("number in directionN " + direction.get("N").get(currCol));
             if (direction.get("N").get(currCol) != numOfMaxN()) {
                 return false;
             }
@@ -278,6 +216,14 @@ public class SkyscraperConfig implements Configuration {
     }
 
 
+    /**
+     * Returns the number of times a maximum was encountered
+     * when traversing through the current column from top
+     * to bottom (the North direction).
+     *
+     * @return The number of times a maximum was encountered
+     * in the current column.
+     */
     private int numOfMaxN() {
         int currMax = 0;
         int numMax = 0;
@@ -287,10 +233,18 @@ public class SkyscraperConfig implements Configuration {
                 currMax = board[row][currCol];
             }
         }
-        System.out.println("row: " + currRow + ", col: " + currCol);
         return numMax;
     }
 
+
+    /**
+     * Returns the number of times a maximum was encountered
+     * when traversing through the current row from left
+     * to right (the West direction).
+     *
+     * @return The number of times a maximum was encountered
+     * in the current row.
+     */
     private int numOfMaxW() {
         int currMax = 0;
         int numMax = 0;
@@ -300,10 +254,18 @@ public class SkyscraperConfig implements Configuration {
                 currMax = num;
             }
         }
-        System.out.println("row: " + currRow + ", col: " + currCol);
         return numMax;
     }
 
+
+    /**
+     * Returns the number of times a maximum was encountered
+     * when traversing through the current column from bottom
+     * to top (the South direction).
+     *
+     * @return The number of times a maximum was encountered
+     * in the current column.
+     */
     private int numOfMaxS() {
         int currMax = 0;
         int numMax = 0;
@@ -313,10 +275,18 @@ public class SkyscraperConfig implements Configuration {
                 currMax = board[num][currCol];
             }
         }
-        System.out.println("row: " + currRow + ", col: " + currCol);
         return numMax;
     }
 
+
+    /**
+     * Returns the number of times a maximum was encountered
+     * when traversing through the current row from left
+     * to right (the East direction).
+     *
+     * @return The number of times a maximum was encountered
+     * in the current row.
+     */
     private int numOfMaxE() {
         int currMax = 0;
         int numMax = 0;
@@ -326,7 +296,6 @@ public class SkyscraperConfig implements Configuration {
                 currMax = board[currRow][num];
             }
         }
-        System.out.println("row: " + currRow + ", col: " + currCol);
         return numMax;
     }
 
@@ -399,3 +368,4 @@ public class SkyscraperConfig implements Configuration {
         return res;
     }
 }
+
