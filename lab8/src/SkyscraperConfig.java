@@ -350,7 +350,12 @@ public class SkyscraperConfig implements Configuration {
         for (int row=0; row < dim; row++) {
             res += "\n" + direction.get("W").get(row) + "|";
             for (int col=0; col < dim; col++) {
-                res += board[row][col];
+                int num = board[row][col];
+                if (num == EMPTY) {
+                    res += EMPTY_CELL;
+                } else {
+                    res += board[row][col];
+                }
                 if (col != dim-1) {
                     res += " ";
                 }
@@ -368,4 +373,3 @@ public class SkyscraperConfig implements Configuration {
         return res;
     }
 }
-
