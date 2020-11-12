@@ -33,8 +33,6 @@ public class SkyscraperConfig implements Configuration {
     /** The current column to be tested */
     private int currCol;
 
-    /** The current numbers in the column */
-    private ArrayList<Integer> column;
 
     /**
      * Constructor, constructs a new SkyscraperConfig instance.
@@ -54,7 +52,6 @@ public class SkyscraperConfig implements Configuration {
      *  @throws FileNotFoundException if file not found
      */
     SkyscraperConfig(String filename) throws FileNotFoundException {
-        this.column = new ArrayList<>();
         this.currCol = -1;
         this.currRow = 0;
         this.direction = new HashMap<>();
@@ -99,7 +96,6 @@ public class SkyscraperConfig implements Configuration {
         this.currRow = copy.currRow;
         this.board = new int[copy.dim][copy.dim];
         this.direction = copy.direction;
-        this.column = copy.column;
         for (int row=0; row < this.dim; row++) {
             System.arraycopy(copy.board[row], 0, this.board[row],
                     0, this.dim);
@@ -114,7 +110,7 @@ public class SkyscraperConfig implements Configuration {
      */
     @Override
     public boolean isGoal() {
-        return (!findEmpty());
+        return !findEmpty();
     }
 
     /**
@@ -125,10 +121,7 @@ public class SkyscraperConfig implements Configuration {
     @Override
     public Collection<Configuration> getSuccessors() {
         findEmpty();
-        this.column.clear();
-        for (int row=0; row < dim; row++) {
-            this.column.add(board[row][currCol]);
-        }
+        System.out.println("current row,col: (" + currRow + ", " + currCol + ")");
         List<Configuration> successors = new LinkedList<Configuration>();
         for (int num=1; num <= this.dim; num++) {
             if (notInRowCol(num)) {
@@ -242,7 +235,99 @@ public class SkyscraperConfig implements Configuration {
                 return false;
             }
         }
+        if (direction.get("S").get(currCol) == dim) {
+            if ((board[currRow][currCol] != wanted.get(currRow)) &&
+                    (board[currRow][currCol] != EMPTY)) {
+                return false;
+            }
+        }
+        boolean hasEmptyRow = false;
+        for (int col=0; col < dim; col++) {
+            if (board[currRow][col] == EMPTY) {
+                hasEmptyRow = true;
+            }
+        }
+        if (!hasEmptyRow) {
+            System.out.println("numOfMaxW " + numOfMaxW());
+            System.out.println("numOfMaxE " + numOfMaxE());
+            if (direction.get("W").get(currRow) != numOfMaxW()) {
+                return false;
+            }
+            if (direction.get("E").get(currRow) != numOfMaxE()) {
+                return false;
+            }
+        }
+        boolean hasEmptyCol = false;
+        for (int row=0; row < dim; row++) {
+            if (board[row][currCol] == EMPTY) {
+                hasEmptyCol = true;
+            }
+        }
+        if (!hasEmptyCol) {
+            System.out.println("numOfMaxN " + numOfMaxN());
+            System.out.println("numOfMaxS " + numOfMaxS());
+            System.out.println("number in directionN " + direction.get("N").get(currCol));
+            if (direction.get("N").get(currCol) != numOfMaxN()) {
+                return false;
+            }
+            if (direction.get("S").get(currCol) != numOfMaxS()) {
+                return false;
+            }
+        }
         return true;
+    }
+
+
+    private int numOfMaxN() {
+        int currMax = 0;
+        int numMax = 0;
+        for (int row=0; row < dim; row++) {
+            if (board[row][currCol] > currMax) {
+                numMax++;
+                currMax = board[row][currCol];
+            }
+        }
+        System.out.println("row: " + currRow + ", col: " + currCol);
+        return numMax;
+    }
+
+    private int numOfMaxW() {
+        int currMax = 0;
+        int numMax = 0;
+        for (int num : board[currRow]) {
+            if (num > currMax) {
+                numMax++;
+                currMax = num;
+            }
+        }
+        System.out.println("row: " + currRow + ", col: " + currCol);
+        return numMax;
+    }
+
+    private int numOfMaxS() {
+        int currMax = 0;
+        int numMax = 0;
+        for (int num = dim-1; num >= 0; num--) {
+            if (board[num][currCol] > currMax) {
+                numMax++;
+                currMax = board[num][currCol];
+            }
+        }
+        System.out.println("row: " + currRow + ", col: " + currCol);
+        return numMax;
+    }
+
+    private int numOfMaxE() {
+        int currMax = 0;
+        int numMax = 0;
+        for (int num = dim-1; num >= 0; num--) {
+            if (board[currRow][num] > currMax) {
+                numMax++;
+                currMax = board[currRow][num];
+            }
+        }
+        System.out.println("row: " + currRow + ", col: " + currCol);
+        return numMax;
     }
 
 
@@ -255,8 +340,10 @@ public class SkyscraperConfig implements Configuration {
      * row or column, will otherwise be false.
      */
     private boolean notInRowCol(int num) {
-        if (column.contains(num)) {
-            return false;
+        for (int row=0; row < dim; row++) {
+            if (board[row][currCol] == num) {
+                return false;
+            }
         }
         for (int col=0; col < dim; col++) {
             if (board[currRow][col] == num) {
